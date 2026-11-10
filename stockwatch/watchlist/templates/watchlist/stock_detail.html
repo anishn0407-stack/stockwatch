@@ -1,0 +1,58 @@
+{% extends "watchlist/base.html" %}
+{% load static stockfmt %}
+{% block title %}{{ stock.name }} – StockWatch{% endblock %}
+
+{% block content %}
+  <a class="back" href="{% url 'home' %}">&larr; All stocks</a>
+
+  <div class="stock-head">
+    <div>
+      <h1>{{ stock.name }}</h1>
+      <div class="stock-id">
+        <span>{{ stock.symbol }}</span>
+        {% if stock.sector %}<span>{{ stock.sector }}</span>{% endif %}
+      </div>
+    </div>
+    {% include "watchlist/_star.html" with stock=stock on=in_wishlist labelled=True %}
+  </div>
+
+  {% if error %}
+    <div class="notice" style="margin-top: 24px">
+      <h2>Price data is unavailable right now</h2>
+      <p>{{ error }}</p>
+      <p>Yahoo Finance may be rate-limiting requests or the symbol may have changed. Wait a minute and reload, or start the server with <code>STOCKWATCH_DEMO=1</code> to browse with generated prices.</p>
+    </div>
+  {% else %}
+    <div class="price-row">
+      <span class="price">{{ stats.price|money:stock.currency }}</span>
+      <span class="price-change {{ stats.change|tone }}">{{ stats.change|signed:stock.currency }} ({{ stats.change_pct|signed_pct }})</span>
+      <span class="price-asof">Close on {{ stats.as_of }}</span>
+    </div>
+
+    <div class="chart-bar">
+      <div class="ranges" role="group" aria-label="Chart range">
+        {% for r in ranges %}<button type="button" data-range="{{ r }}" aria-pressed="{% if r == '1Y' %}true{% else %}false{% endif %}">{% if r == 'MAX' %}Max{% else %}{{ r }}{% endif %}</button>{% endfor %}
+      </div>
+      <span id="range-change" class="range-change"></span>
+    </div>
+
+    <div id="chart" class="chart" data-symbol="{{ stock.symbol }}" data-currency="{{ stock.currency }}">
+      <canvas role="img" aria-label="Closing price chart for {{ stock.name }}"></canvas>
+      <div class="chart-tip" hidden></div>
+      <div class="chart-msg">Loading price history…</div>
+    </div>
+
+    <dl class="stats">
+      <div><dt>Open</dt><dd>{{ stats.open|money:stock.currency }}</dd></div>
+      <div><dt>Day high</dt><dd>{{ stats.high|money:stock.currency }}</dd></div>
+      <div><dt>Day low</dt><dd>{{ stats.low|money:stock.currency }}</dd></div>
+      <div><dt>Volume</dt><dd>{{ stats.volume|volume }}</dd></div>
+      <div><dt>52-week high</dt><dd>{{ stats.week52_high|money:stock.currency }}</dd></div>
+      <div><dt>52-week low</dt><dd>{{ stats.week52_low|money:stock.currency }}</dd></div>
+      <div><dt>Market cap</dt><dd>{{ stats.market_cap|market_cap:stock.currency }}</dd></div>
+      <div><dt>History starts</dt><dd>{{ stats.first_date }}</dd></div>
+    </dl>
+  {% endif %}
+{% endblock %}
+
+{% block scripts %}{% if not error %}<script src="{% static 'watchlist/pricechart.js' %}" defer></script>{% endif %}{% endblock %}

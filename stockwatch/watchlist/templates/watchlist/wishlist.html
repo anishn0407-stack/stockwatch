@@ -1,0 +1,64 @@
+{% extends "watchlist/base.html" %}
+{% load stockfmt %}
+{% block title %}Wishlist – StockWatch{% endblock %}
+
+{% block content %}
+  <div class="page-head">
+    <div>
+      <h1>Wishlist</h1>
+      <p>Prices are the latest daily close. Use the arrows to change the order.</p>
+    </div>
+  </div>
+
+  {% if rows %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Company</th>
+          <th class="num">Price</th>
+          <th class="num">Change</th>
+          <th class="num">Change %</th>
+          <th class="num"><span class="sr-only">Actions</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          <td class="co">
+            <a href="{% url 'stock_detail' row.stock.symbol %}">{{ row.stock.name }}</a>
+            <small>{{ row.stock.symbol }}</small>
+          </td>
+          {% if row.quote %}
+            <td class="num">{{ row.quote.price|money:row.stock.currency }}</td>
+            <td class="num {{ row.quote.change|tone }}">{{ row.quote.change|signed:row.stock.currency }}</td>
+            <td class="num {{ row.quote.change_pct|tone }}">{{ row.quote.change_pct|signed_pct }}</td>
+          {% else %}
+            <td class="num muted" colspan="3">Price unavailable right now</td>
+          {% endif %}
+          <td class="num">
+            <div class="row-actions">
+              <form method="post" action="{% url 'wishlist_move' row.stock.symbol 'up' %}">{% csrf_token %}
+                <button class="icon-btn" aria-label="Move {{ row.stock.name }} up" title="Move up"{% if forloop.first %} disabled{% endif %}>&uarr;</button>
+              </form>
+              <form method="post" action="{% url 'wishlist_move' row.stock.symbol 'down' %}">{% csrf_token %}
+                <button class="icon-btn" aria-label="Move {{ row.stock.name }} down" title="Move down"{% if forloop.last %} disabled{% endif %}>&darr;</button>
+              </form>
+              <form method="post" action="{% url 'wishlist_remove' row.stock.symbol %}">{% csrf_token %}
+                <button class="icon-btn danger" aria-label="Remove {{ row.stock.name }} from wishlist">Remove</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="notice">
+    <h2>Your wishlist is empty</h2>
+    <p>Open a stock and press the star to save it here.</p>
+    <p style="margin-top: 14px"><a class="btn" style="display:inline-flex;align-items:center;text-decoration:none" href="{% url 'home' %}">Browse stocks</a></p>
+  </div>
+  {% endif %}
+{% endblock %}

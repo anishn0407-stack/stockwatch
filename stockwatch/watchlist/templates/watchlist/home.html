@@ -1,0 +1,48 @@
+{% extends "watchlist/base.html" %}
+{% block title %}Stocks – StockWatch{% endblock %}
+
+{% block content %}
+  <div class="page-head">
+    <div>
+      <h1>Stocks</h1>
+      <p>Open a stock to see its full price history, and press the star to save it to your wishlist.</p>
+    </div>
+    <label class="filter">Sector
+      <select id="sector-filter">
+        <option value="">All sectors</option>
+        {% for s in sectors %}<option value="{{ s }}">{{ s }}</option>{% endfor %}
+      </select>
+    </label>
+  </div>
+
+  {% if stocks %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="cell-star"><span class="sr-only">Wishlist</span></th>
+          <th>Company</th>
+          <th class="col-sector">Sector</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for stock in stocks %}
+        <tr data-sector="{{ stock.sector }}">
+          <td class="cell-star">{% include "watchlist/_star.html" with stock=stock on=stock.wishlist_item %}</td>
+          <td class="co">
+            <a href="{% url 'stock_detail' stock.symbol %}">{{ stock.name }}</a>
+            <small>{{ stock.symbol }}</small>
+          </td>
+          <td class="col-sector muted">{{ stock.sector }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="notice">
+    <h2>No stocks loaded yet</h2>
+    <p>Load the starter list by running <code>python manage.py seed_stocks</code>, then refresh this page.</p>
+  </div>
+  {% endif %}
+{% endblock %}

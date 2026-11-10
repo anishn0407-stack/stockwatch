@@ -1,0 +1,41 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <title>{% block title %}StockWatch{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;650;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'watchlist/style.css' %}">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="{% url 'home' %}">
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z"/></svg>
+        StockWatch
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="{% url 'home' %}"{% if request.resolver_match.url_name == 'home' %} aria-current="page"{% endif %}>Stocks</a>
+        <a href="{% url 'wishlist' %}"{% if request.resolver_match.url_name == 'wishlist' %} aria-current="page"{% endif %}>Wishlist</a>
+      </nav>
+      <div class="search" role="search">
+        <input id="search" type="search" placeholder="Search by company, symbol or sector" autocomplete="off"
+               role="combobox" aria-label="Search stocks" aria-autocomplete="list" aria-expanded="false" aria-controls="search-results">
+        <ul id="search-results" class="search-results" role="listbox" aria-label="Matching stocks" hidden></ul>
+      </div>
+      <button id="open-desktop" class="btn-quiet" type="button">Open desktop window</button>
+    </div>
+  </header>
+  {% if demo %}<p class="demo-bar">Demo mode: prices are generated, not real market data.</p>{% endif %}
+  <main id="main">
+    {% block content %}{% endblock %}
+  </main>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script src="{% static 'watchlist/app.js' %}" defer></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

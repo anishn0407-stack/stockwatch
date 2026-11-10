@@ -1,0 +1,6 @@
+<button type="button" class="star{% if labelled %} labelled{% endif %}" data-symbol="{{ stock.symbol }}" data-name="{{ stock.name }}"
+        aria-pressed="{% if on %}true{% else %}false{% endif %}"
+        aria-label="{% if on %}Remove {{ stock.name }} from wishlist{% else %}Add {{ stock.name }} to wishlist{% endif %}">
+  <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z"/></svg>
+  {% if labelled %}<span class="star-label">{% if on %}In your wishlist{% else %}Add to wishlist{% endif %}</span>{% endif %}
+</button>
